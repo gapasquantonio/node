@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/gapasquantonio/node/issues"
   },
-  "homepage": "https://github.com/gapasquantonio/node#readme"
+  "homepage": "https://github.com/gapasquantonio/node#readme",
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
 }
