@@ -50,6 +50,40 @@ class User {
       });
     }).catch(err => { console.log(err); });
   }
+
+  deleteItemFromCart(productId) {
+    const updatedCartItems = this.cart.items.filter(item => {
+      return item.productId.toString() !== productId.toString();
+    });
+    const db = getDb();
+    return db.collection('users').updateOne({ _id: this._id }, { $set: { cart: { items: updatedCartItems } } }).then(result => { return result }).catch(err => { console.log(err); });
+  }
+  addOrder() {
+    const db = getDb();
+    return this.getCart().then(products => {
+      const order = {
+        items: products,
+        user: {
+          _id: new mongodb.ObjectId(this._id),
+          name: this.name
+        }
+      };
+      return db.collection('orders').insertOne(order);
+    }).then(result => {
+      this.cart = { items: [] };
+      return db.collection('users').updateOne({ _id: this._id }, { $set: { cart: { items: [] } } });
+    }).catch(err => { console.log(err); });
+  }
+
+  getOrders() {
+    const db = getDb();
+
+    return db.collection('orders').find({ 'user._id': new mongodb.ObjectId(this._id) }).toArray().then(orders => {
+      return orders;
+    }).catch(err => { console.log(err); });
+  }
+
+
   static fetchUserById(userId) {
     const db = getDb();
     return db.collection('users').findOne({ _id: new mongodb.ObjectId(userId) }).then(product => { return product }).catch(err => { console.log(err); });
