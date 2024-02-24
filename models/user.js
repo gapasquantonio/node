@@ -35,6 +35,21 @@ class User {
     return db.collection('users').updateOne({ _id: this._id }, { $set: { cart: updatedCart } }).then(result => { return result }).catch(err => { console.log(err); });
   }
 
+  getCart() {
+    const db = getDb();
+    const productIds = this.cart.items.map(i => {
+      return i.productId;
+    });
+    return db.collection('products').find({ _id: { $in: productIds } }).toArray().then(products => {
+      return products.map(p => {
+        return {
+          ...p, quantity: this.cart.items.find(i => {
+            return i.productId.toString() === p._id.toString();
+          }).quantity
+        };
+      });
+    }).catch(err => { console.log(err); });
+  }
   static fetchUserById(userId) {
     const db = getDb();
     return db.collection('users').findOne({ _id: new mongodb.ObjectId(userId) }).then(product => { return product }).catch(err => { console.log(err); });
